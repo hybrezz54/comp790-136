@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_marginLeft="20dp"
+    android:layout_marginRight="20dp"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/leftButton"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_weight="3"
+            android:text="Left Button"
+            android:backgroundTint="@color/design_default_color_error"
+            android:backgroundTintMode="src_over"
+            android:onClick="onLeftButtonClick" />
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/rightButton"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_weight="3"
+            android:text="Right Button"
+            android:backgroundTint="@color/design_default_color_error"
+            android:backgroundTintMode="src_over"
+            android:onClick="onRightButtonClick" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:text="Hello World!"
+        android:textColor="@color/white"
+        android:background="@color/cardview_dark_background"
+        android:padding="16dp"
+        android:layout_marginTop="10dp" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_weight="1"
+        android:layout_marginTop="20dp"
+        android:background="@color/teal_200"/>
+
+    <Button
+        android:id="@+id/snapButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Snap"
+        android:onClick="onSnapButtonClick" />
+
+</LinearLayout>
