@@ -49,6 +49,11 @@ public class Ball {
         y += dy;
     }
 
+    public void collide() {
+        collideX();
+        collideY();
+    }
+
     public void collideX() {
         dx = -dx;
     }

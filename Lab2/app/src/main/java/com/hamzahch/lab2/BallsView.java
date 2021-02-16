@@ -10,6 +10,8 @@ import android.view.View;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class BallsView extends View {
 
@@ -69,6 +71,12 @@ public class BallsView extends View {
             if (y <= (rectY + r) || y >= (rectHeight - r))
                 b.collideY();
 
+            List<Ball> collided = balls.stream().filter(ball -> Math.abs(x - ball.getX()) <= r && Math.abs(y - ball.getY()) <= r).collect(Collectors.toList());
+            if (collided.size() > 1) {
+                collided.forEach(ball -> ball.collide());
+                onDrawListener.onCollide();
+            }
+
             b.move();
             b.draw(canvas, ballPaint);
         }
@@ -92,5 +100,5 @@ public class BallsView extends View {
 }
 
 interface OnDrawListener {
-    public void onDraw(int counter);
+    public void onCollide();
 }

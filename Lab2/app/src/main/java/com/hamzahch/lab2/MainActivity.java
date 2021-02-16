@@ -1,15 +1,14 @@
 package com.hamzahch.lab2;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
-import java.util.Calendar;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity implements OnDrawListener {
+
+    int collisions = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,16 +17,24 @@ public class MainActivity extends AppCompatActivity implements OnDrawListener {
 
         BallsView ballsView = findViewById(R.id.ballsView);
         ballsView.setOnDrawListener(this);
+        updateTextView();
     }
 
     public void onAddBtnClick(View view) {
         BallsView ballsView = findViewById(R.id.ballsView);
         ballsView.addBall();
+        collisions = 0;
+        updateTextView();
     }
 
     @Override
-    public void onDraw(int counter) {
+    public void onCollide() {
+        collisions++;
+        updateTextView();
+    }
+
+    private void updateTextView() {
         TextView textView = findViewById(R.id.textView);
-        textView.setText(textView.getText() + " " + counter);
+        textView.setText("Collisions " + collisions);
     }
 }
