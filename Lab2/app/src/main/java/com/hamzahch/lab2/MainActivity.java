@@ -6,9 +6,12 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class MainActivity extends AppCompatActivity implements OnDrawListener {
 
-    int collisions = 0;
+    private int collisions = 0;
+    private int seconds = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,23 +21,47 @@ public class MainActivity extends AppCompatActivity implements OnDrawListener {
         BallsView ballsView = findViewById(R.id.ballsView);
         ballsView.setOnDrawListener(this);
         updateTextView();
+
+        Thread thread = new Thread() {
+
+            @Override
+            public void run() {
+                try {
+                    while (!isInterrupted()) {
+                        Thread.sleep(1000);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                seconds++;
+                                updateTextView();
+                            }
+                        });
+                    }
+                } catch (InterruptedException e) {
+                }
+            }
+        };
+
+        thread.start();
     }
 
     public void onAddBtnClick(View view) {
         BallsView ballsView = findViewById(R.id.ballsView);
         ballsView.addBall();
         collisions = 0;
-        updateTextView();
-    }
-
-    @Override
-    public void onCollide() {
-        collisions++;
+        seconds = 0;
         updateTextView();
     }
 
     private void updateTextView() {
         TextView textView = findViewById(R.id.textView);
-        textView.setText("Collisions " + collisions);
+        textView.setText("Collisions: " + collisions + " (in " + seconds + " seconds)");
+
+    }
+
+    @Override
+    public void onCollide(int collisions) {
+        this.collisions += collisions;
+        updateTextView();
     }
 }

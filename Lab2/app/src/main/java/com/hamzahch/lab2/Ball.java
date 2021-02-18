@@ -10,6 +10,7 @@ public class Ball {
     private int x, y, dx, dy;
     private int r = 5;
     private int speed = 2;
+    private boolean isCollided = false;
 
     public Ball(int x, int y) {
         this(x, y, 0, 0);
@@ -28,6 +29,10 @@ public class Ball {
         dy = r.nextBoolean() ? speed : -speed;
     }
 
+    public void resetCollided() {
+        isCollided = false;
+    }
+
     public int getX() {
         return x;
     }
@@ -36,9 +41,15 @@ public class Ball {
         return y;
     }
 
+    public int getDx() { return dx; }
+
+    public int getDy() { return dy; }
+
     public int getRadius() {
         return r;
     }
+
+    public boolean getCollided() { return isCollided; }
 
     public void draw(Canvas canvas, Paint paint) {
         canvas.drawCircle(x, y, r, paint);
@@ -49,9 +60,10 @@ public class Ball {
         y += dy;
     }
 
-    public void collide() {
-        collideX();
-        collideY();
+    public void collide(int dx, int dy) {
+        isCollided = true;
+        this.dx = dx;
+        this.dy = dy;
     }
 
     public void collideX() {
@@ -60,6 +72,10 @@ public class Ball {
 
     public void collideY() {
         dy = -dy;
+    }
+
+    public double getDistance(int x, int y) {
+        return Math.sqrt(Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2));
     }
 
 }

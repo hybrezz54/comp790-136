@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class BallsView extends View {
@@ -64,6 +65,18 @@ public class BallsView extends View {
             int x = b.getX();
             int y = b.getY();
             int r = b.getRadius();
+            int dx = b.getDx();
+            int dy = b.getDy();
+
+            List<Ball> collided = balls.stream().filter(ball -> b != ball && b.getDistance(ball.getX(), ball.getY()) < (r + ball.getRadius())).collect(Collectors.toList());
+            if (collided.size() > 0) {
+                collided.forEach(ball -> {
+                    if (!ball.getCollided()) {
+                        b.collide(ball.getDx(), ball.getDy());
+                        ball.collide(dx, dy);
+                    }
+                });
+            }
 
             if (x <= (rectX + r) || x >= (rectWidth - r))
                 b.collideX();
@@ -71,15 +84,18 @@ public class BallsView extends View {
             if (y <= (rectY + r) || y >= (rectHeight - r))
                 b.collideY();
 
-            List<Ball> collided = balls.stream().filter(ball -> Math.abs(x - ball.getX()) <= r && Math.abs(y - ball.getY()) <= r).collect(Collectors.toList());
-            if (collided.size() > 1) {
-                collided.forEach(ball -> ball.collide());
-                onDrawListener.onCollide();
-            }
-
             b.move();
             b.draw(canvas, ballPaint);
         }
+
+        AtomicInteger counter = new AtomicInteger();
+        balls.forEach(ball -> {
+            if (ball.getCollided()) {
+                ball.resetCollided();
+                counter.getAndIncrement();
+            }
+        });
+        onDrawListener.onCollide(counter.get() / 2);
 
         invalidate();
     }
@@ -100,5 +116,5 @@ public class BallsView extends View {
 }
 
 interface OnDrawListener {
-    public void onCollide();
+    public void onCollide(int collisions);
 }
