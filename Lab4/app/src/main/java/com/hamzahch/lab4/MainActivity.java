@@ -2,6 +2,7 @@ package com.hamzahch.lab4;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -26,23 +27,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void foo(int m) {
-        Thread t = new Thread() {
-            int seconds = 0;
+        new UpdateTextViewTask().execute(m);
+    }
 
-            @Override
-            public void run() {
-                try {
-                    while (seconds < m) {
-                        Thread.sleep(1000);
-                        seconds++;
-                        Log.v("TAG", seconds + " seconds elapsed");
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+    private class UpdateTextViewTask extends AsyncTask<Integer, String, Void> {
+
+        private int seconds = 0;
+
+        @Override
+        protected Void doInBackground(Integer... nums) {
+            try {
+                while (seconds < nums[0]) {
+                    Thread.sleep(1000);
+                    seconds++;
+                    publishProgress(seconds + " seconds elapsed");
                 }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        };
-        t.start();
+
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            mTextView.setText(values[0]);
+        }
     }
 
 }
+
