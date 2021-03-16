@@ -23,7 +23,11 @@ public class IncrementService extends Service {
         if (intent != null && intent.getExtras() != null) {
             int n = intent.getExtras().getInt("N");
             Toast.makeText(getApplicationContext(), "Number received from activity: " + n,
-                    Toast.LENGTH_SHORT).show();
+                    Toast.LENGTH_LONG).show();
+
+            Intent brIntent = new Intent(this, IncrementReceiver.class);
+            brIntent.putExtra("N", n + 1);
+            sendBroadcast(brIntent);
         }
 
         return START_NOT_STICKY;

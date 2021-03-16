@@ -10,6 +10,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Lab5">
 
+        <receiver
+            android:name=".IncrementReceiver"
+            android:enabled="true"
+            android:exported="false" />
+
         <service
             android:name=".IncrementService"
             android:enabled="true"
