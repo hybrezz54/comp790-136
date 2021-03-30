@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Lab6</string>
+    <string name="textSize">Size:</string>
+    <string name="textTag">Tag:</string>
+    <string name="btnSave">Save</string>
+    <string name="btnCapture">Capture</string>
+    <string name="btnLoad">Load</string>
+</resources>
