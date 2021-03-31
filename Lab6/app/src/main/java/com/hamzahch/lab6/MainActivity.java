@@ -97,8 +97,8 @@ public class MainActivity extends AppCompatActivity {
 
         if (!tags.equals("") && !size.equals("")) {
             int sizeNum = Integer.parseInt(size);
-            int minSize = (int) 0.75 * sizeNum;
-            int maxSize = (int) 1.25 * sizeNum;
+            int minSize = (int) (0.75 * sizeNum);
+            int maxSize = (int) (1.25 * sizeNum);
 
             Cursor c = db.rawQuery("SELECT * FROM Photos WHERE tags LIKE '" +
                     tags + "' AND size >= " + minSize + " AND size <= " + maxSize + ";",
@@ -110,8 +110,8 @@ public class MainActivity extends AppCompatActivity {
             updateViewFromResult(c);
         } else if (!size.equals("")) {
             int sizeNum = Integer.parseInt(size);
-            int minSize = (int) 0.75 * sizeNum;
-            int maxSize = (int) 1.25 * sizeNum;
+            int minSize = (int) (0.75 * sizeNum);
+            int maxSize = (int) (1.25 * sizeNum);
 
             // retrieve data from db
             Cursor c = db.rawQuery("SELECT * FROM Photos WHERE size >= " + minSize +
@@ -137,6 +137,8 @@ public class MainActivity extends AppCompatActivity {
             imageView.setImageBitmap(b);
             editTag.setText(t);
             editSize.setText("" + s);
+        } else {
+            imageView.setImageBitmap(null);
         }
     }
 
