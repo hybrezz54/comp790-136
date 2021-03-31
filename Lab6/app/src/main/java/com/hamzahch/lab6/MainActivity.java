@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -18,15 +17,20 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.google.android.material.slider.Slider;
+
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
     private ImageView imageView;
+    private Slider slider;
     private EditText editTag;
     private EditText editSize;
     private SQLiteDatabase db;
 
+    private ArrayList<Photo> photos = new ArrayList<>();
     private int size = 0;
 
     @Override
@@ -36,8 +40,16 @@ public class MainActivity extends AppCompatActivity {
 
         // get views
         imageView = findViewById(R.id.imageView);
+        slider = findViewById(R.id.slider);
         editTag = findViewById(R.id.editTag);
         editSize = findViewById(R.id.editSize);
+
+        // slider event handler
+        slider.addOnChangeListener((slider, value, fromUser) -> {
+            int val = (int) value;
+            if (val < photos.size())
+                updateViewsFromPhoto(val);
+        });
 
         // setup db
         db = openOrCreateDatabase("PhotoDB", Context.MODE_PRIVATE, null);
@@ -103,11 +115,11 @@ public class MainActivity extends AppCompatActivity {
             Cursor c = db.rawQuery("SELECT * FROM Photos WHERE tags LIKE '" +
                     tags + "' AND size >= " + minSize + " AND size <= " + maxSize + ";",
                     null);
-            updateViewFromResult(c);
+            updatePhotosFromResult(c);
         } else if (!tags.equals("")) {
             Cursor c = db.rawQuery("SELECT * FROM Photos WHERE tags LIKE '" +
                    tags + "';", null);
-            updateViewFromResult(c);
+            updatePhotosFromResult(c);
         } else if (!size.equals("")) {
             int sizeNum = Integer.parseInt(size);
             int minSize = (int) (0.75 * sizeNum);
@@ -116,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
             // retrieve data from db
             Cursor c = db.rawQuery("SELECT * FROM Photos WHERE size >= " + minSize +
                     " AND size <= " + maxSize + ";", null);
-            updateViewFromResult(c);
+            updatePhotosFromResult(c);
         }
     }
 
@@ -125,21 +137,34 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, 1);
     }
 
-    private void updateViewFromResult(Cursor c) {
+    private void updatePhotosFromResult(Cursor c) {
+        photos.clear();
+
         if (c.getCount() > 0) {
-            c.moveToFirst();
-            String t = c.getString(1);
-            int s = c.getInt(2);
-            byte[] ba = c.getBlob(3);
+            while (c.moveToNext()) {
+                String t = c.getString(1);
+                int s = c.getInt(2);
+                byte[] ba = c.getBlob(3);
+
+                Photo p = new Photo(t, s, ba);
+                photos.add(p);
+            }
 
             // update views
-            Bitmap b = BitmapFactory.decodeByteArray(ba, 0, ba.length);
-            imageView.setImageBitmap(b);
-            editTag.setText(t);
-            editSize.setText("" + s);
+            slider.setValueTo(photos.size());
+            updateViewsFromPhoto(0);
         } else {
+            slider.setValue(0);
+            slider.setValueTo(1);
             imageView.setImageBitmap(null);
         }
+    }
+
+    private void updateViewsFromPhoto(int index) {
+        Photo p = photos.get(index);
+        imageView.setImageBitmap(p.getImageBitmap());
+        editTag.setText(p.getTags());
+        editSize.setText("" + p.getSize());
     }
 
 }
