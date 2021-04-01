@@ -12,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -104,7 +105,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onLoad(View view) {
-        String tags = editTag.getText().toString();
+        String tags = TextUtils.join("%' OR tags LIKE '%",
+                editTag.getText().toString().split("\\s*;\\s*"));
         String size = editSize.getText().toString();
 
         if (!tags.equals("") && !size.equals("")) {
@@ -112,13 +114,17 @@ public class MainActivity extends AppCompatActivity {
             int minSize = (int) (0.75 * sizeNum);
             int maxSize = (int) (1.25 * sizeNum);
 
-            Cursor c = db.rawQuery("SELECT * FROM Photos WHERE tags LIKE '" +
-                    tags + "' AND size >= " + minSize + " AND size <= " + maxSize + ";",
+            Cursor c = db.rawQuery("SELECT * FROM Photos WHERE (tags LIKE '%" +
+                    tags + "%') AND size >= " + minSize + " AND size <= " + maxSize + ";",
                     null);
+            Log.e("Lab6", "SELECT * FROM Photos WHERE tags LIKE '%" +
+                    tags + "%' AND size >= " + minSize + " AND size <= " + maxSize + ";");
             updatePhotosFromResult(c);
         } else if (!tags.equals("")) {
-            Cursor c = db.rawQuery("SELECT * FROM Photos WHERE tags LIKE '" +
-                   tags + "';", null);
+            Cursor c = db.rawQuery("SELECT * FROM Photos WHERE tags LIKE '%" +
+                   tags + "%';", null);
+            Log.e("Lab6", "SELECT * FROM Photos WHERE tags LIKE '%" +
+                    tags + "%';");
             updatePhotosFromResult(c);
         } else if (!size.equals("")) {
             int sizeNum = Integer.parseInt(size);
