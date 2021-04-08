@@ -1,14 +1,12 @@
 package com.hamzahch.lab7;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -18,10 +16,26 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.material.slider.Slider;
 
+import org.tensorflow.lite.support.image.TensorImage;
+import org.tensorflow.lite.task.core.vision.ImageProcessingOptions;
+import org.tensorflow.lite.task.vision.classifier.Classifications;
+import org.tensorflow.lite.task.vision.classifier.ImageClassifier;
+import org.tensorflow.lite.task.vision.classifier.ImageClassifier.ImageClassifierOptions;
+
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static java.lang.Math.min;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -70,6 +84,67 @@ public class MainActivity extends AppCompatActivity {
 
             size = bitmap.getByteCount();
             editSize.setText("" + size);
+
+            try {
+                // create classifier instance
+                ImageClassifierOptions options = ImageClassifierOptions.builder()
+                        .setMaxResults(5).build();
+                ImageClassifier classifier = ImageClassifier.createFromFileAndOptions(this,
+                        "mobilenet_v1_1.0_224_quant.tflite", options);
+
+                // set props
+                TensorImage image = TensorImage.fromBitmap(bitmap);
+                int width = bitmap.getWidth();
+                int height = bitmap.getHeight();
+                int cropSize = min(width, height);
+
+                // run inference
+                ImageProcessingOptions imageOptions =
+                        ImageProcessingOptions.builder()
+                                // .setOrientation(getOrientation(sensorOrientation))
+                                // Set the ROI to the center of the image.
+                                .setRoi(
+                                        new Rect(
+                                                /*left=*/ (width - cropSize) / 2,
+                                                /*top=*/ (height - cropSize) / 2,
+                                                /*right=*/ (width + cropSize) / 2,
+                                                /*bottom=*/ (height + cropSize) / 2))
+                                .build();
+
+                List<Classifications> classifications = classifier.classify(image,
+                        imageOptions);
+                List<Integer> results = new ArrayList<>();
+
+                classifications.forEach(classification -> {
+                    classification.getCategories().forEach(category -> {
+                        results.add(Integer.parseInt(category.getLabel()));
+                    });
+                });
+
+                // set up results
+                List<String> labels = new ArrayList<>();
+                Collections.sort(results);
+                BufferedReader br = new BufferedReader(new InputStreamReader(getAssets().open("labels_mobilenet_quant_v1_224.txt")));
+                int i = 0;
+
+                // iterate over labels
+                for (String line = br.readLine(); line != null; line = br.readLine()) {
+                    if (results.size() <= 0)
+                        break;
+
+                    if (i == results.get(0)) {
+                        labels.add(line);
+                        results.remove(0);
+                    }
+
+                    i++;
+                }
+
+                br.close();
+                editTag.setText(TextUtils.join(";", labels));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
